@@ -1,0 +1,22 @@
+{
+	"name" : "mprospero/api",
+	"type" : "project",
+	"license" : "1.0.0",
+	"autoload" : {
+		"psr-4" : {
+			"src\\" : "src/"
+		}
+	},
+	"authors" : [{
+			"name" : "Mario PROSPERO",
+			"email" : "mprospero@sii.fr"
+		}
+	],
+	"require" : {
+		"twig/twig" : "1.9",
+		"twbs/bootstrap" : "5.1.3",
+		"curl/curl": "^2.0",
+		"vlucas/phpdotenv": "^5.5"
+	},
+	"minimum-stability" : "stable"
+}
