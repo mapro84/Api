@@ -8,7 +8,9 @@ use src\classes\controller\TaskController;
 use src\classes\DB\DB;
 use src\classes\entity\Task;
 
+// set_error_handler("ErrorHandler::handleError");
 // set_exception_handler("src\classes\exception\ErrorHandler::handleException");
+
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $parts = explode("/", $path);
 $resource = $parts[2];
