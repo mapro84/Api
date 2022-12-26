@@ -5,7 +5,8 @@ curl http://127.0.0.1/api/index.php/tasks
 curl http://127.0.0.1/api/index.php/tasks/2
 curl -X POST -F 'name=linuxize' http://127.0.0.1/api/index.php/tasks
 curl -X DELETE http://127.0.0.1/api/index.php/tasks/8
-curl -X DELETE http://127.0.0.1/api/index.php/tasks/8
+curl -X PUT -H "Content-Type: application/json" -d 'name=Watch&priority=5&is_completed=1' http://127.0.0.1/api/index.php/tasks/2
+
 
 // Excepting a json response from the server
 curl -X DELETE http://127.0.0.1/api/index.php/tasks/7 -H "Accept: application/json"

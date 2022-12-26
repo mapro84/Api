@@ -50,6 +50,12 @@ class TaskController{
 				break;
 					
 				case "PUT":
+					$data = array(); //tableau qui va contenir les données reçues
+                    parse_str(file_get_contents('php://input'), $data);
+                    
+var_dump($data);
+
+
 					$id = $this->task->update($data);
 				break;
 
