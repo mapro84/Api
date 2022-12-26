@@ -12,7 +12,7 @@ class Task{
 		$this->PdoConnection = DB::getInstance();
 	}
 	
-	public function get(string $id) { // array | false in php8
+	public function get(string $id): array | false  {
 		$sql = "SELECT * FROM task WHERE id= :id";
 		$statement = $this->PdoConnection->prepare($sql);
 		$statement->bindValue(":id", $id, PDO::PARAM_INT);
@@ -53,5 +53,29 @@ class Task{
         
 		return $this->PdoConnection->lastInsertId();
 	}
-	
+
+	public function update(array $data): string {
+		$sql = "INSERT INTO task (name, priority, is_completed)
+                VALUES (:name, :priority, :is_completed)";
+		$statement = $this->PdoConnection->prepare($sql);
+		$statement->bindValue(":name", $data["name"], PDO::PARAM_STR);
+		if(empty($data["priority"])){
+			$statement->bindValue(":priority", null, PDO::PARAM_NULL);
+		}else{
+			$statement->bindValue(":priority", $data["priority"], PDO::PARAM_INT);
+		}
+		$statement->bindValue(":is_completed", $data["is_completed"] ?? false, PDO::PARAM_BOOL);
+		$statement->execute();
+        
+		return $this->PdoConnection->lastInsertId();
+	}
+
+	public function delete(string $id): bool {
+		$sql = "DELETE FROM task WHERE id= :id";
+		$statement = $this->PdoConnection->prepare($sql);
+		$statement->bindValue(":id", $id, PDO::PARAM_INT);
+		$result = $statement->execute();
+		
+		return $result;
+	}
 }

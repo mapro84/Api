@@ -13,23 +13,22 @@ class TaskController{
 	
 	public function processRequest(string $method, ?string $id): void {
 		
-		if($id === null){
+		if(empty($id)){
 			if($method == "GET"){
-				
+
 				echo json_encode($this->task->getAll());
-				
+
 			}elseif($method == "POST"){
-// 				$data = (array) json_decode(file_get_contents("php://input"), true);
-			    $data = array('name'=>'','priority'=>'rr');
+
+				$data = $_POST;
 			    $errors = $this->getValidationErrors($data);
-			    var_dump($errors);die();
 			    if(!empty($errors)){
 			    	$this->respondUnprocessableEntity($errors);
 			    	return;
 			    }
 			    $id = $this->task->create($data);
 			    $this->respondCreated($id);
-			    
+
 			}else{
 				$this->respondMethodNotAllowed("GET, POST");
 			}
@@ -44,15 +43,25 @@ class TaskController{
 			switch($method){
 				case "GET":
 					echo json_encode($task);
-					break;
+				break;
 					
 				case "PATCH":
-					echo "update $id";
-					break;
+					$id = $this->task->update($data);
+				break;
 					
+				case "PUT":
+					$id = $this->task->update($data);
+				break;
+
 				case "DELETE":
-					echo "delete $id";
-					break;
+					$res = $this->task->delete($id);
+					if($res === false){
+						// TODO WHY DOES NOT WORK
+					  $this->respondNotDeleted($id);
+					}else{
+					  $this->respondDeleted($id);
+					}
+				break;
 					
 				default: $this->respondMethodNotAllowed("GET, PATCH, DELETE");
 					
@@ -81,6 +90,16 @@ class TaskController{
 		echo json_encode(["message" => "Task created", "id" => $id]);
 	}
 	
+	private function respondDeleted(string $id): void{
+		http_response_code(201);
+		echo json_encode(["message" => "Task deleted", "id" => $id]);
+	}
+
+	private function respondNotDeleted(string $id): void{
+		http_response_code(500);
+		echo json_encode(["message" => "Task with id $id not deleted"]);
+	}
+
 	private function getValidationErrors(array $data): array{
 		$errors = [];
 		
@@ -89,7 +108,6 @@ class TaskController{
 		}
 		if(!empty($data["priority"])){
 			if(filter_var($data["priority"], FILTER_VALIDATE_INT) === false){
-				echo 'la';
 				$errors[] = "priority must be an integer";
 			}
 		}

@@ -28,7 +28,7 @@ class DB{
 
     public function clone(){}
 
-    private function getPDOConnection(){
+    private static function getPDOConnection(){
     	
     	$config = Config::getGenConf();
     	
