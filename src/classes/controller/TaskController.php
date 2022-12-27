@@ -50,13 +50,20 @@ class TaskController{
 				break;
 					
 				case "PUT":
-					$data = array(); //tableau qui va contenir les données reçues
+					$data = array();
                     parse_str(file_get_contents('php://input'), $data);
-                    
-var_dump($data);
-
-
-					$id = $this->task->update($data);
+                    $errors = $this->getValidationErrors($data);
+					if(!empty($errors)){
+						$this->respondUnprocessableEntity($errors);
+						return;
+					}
+					$res = $this->task->update($id, $data);
+					if($res === false){
+						// TODO WHY DOES NOT WORK
+					  $this->respondNotUpdated($id);
+					}else{
+						$this->respondUpdated($id);
+					}
 				break;
 
 				case "DELETE":
@@ -95,7 +102,12 @@ var_dump($data);
 		http_response_code(201);
 		echo json_encode(["message" => "Task created", "id" => $id]);
 	}
-	
+
+	private function respondUpdated(string $id): void{
+		http_response_code(201);
+		echo json_encode(["message" => "Task updated", "id" => $id]);
+	}
+
 	private function respondDeleted(string $id): void{
 		http_response_code(201);
 		echo json_encode(["message" => "Task deleted", "id" => $id]);
@@ -106,17 +118,39 @@ var_dump($data);
 		echo json_encode(["message" => "Task with id $id not deleted"]);
 	}
 
+	private function respondNotUpdated(string $id): void{
+		http_response_code(500);
+		echo json_encode(["message" => "Task with id $id not updated"]);
+	}
+
 	private function getValidationErrors(array $data): array{
 		$errors = [];
 		
 		if(empty($data["name"])){
 			$errors[] = "Name is required";
 		}
-		if(!empty($data["priority"])){
-			if(filter_var($data["priority"], FILTER_VALIDATE_INT) === false){
-				$errors[] = "priority must be an integer";
+
+		if(isset($data["priority"])){
+			if(!empty($data["priority"])){
+				if(filter_var($data["priority"], FILTER_VALIDATE_INT) === false){
+					$errors[] = "priority must be an integer";
+				}
+			}elseif($data["priority"] === '' || $data["priority"] == NULL){
+				$errors[] = "You should set the value priority at 0 or 1";
 			}
-		}
+	    }
+
+		if(isset($data["is_completed"])){
+			if(!empty($data["is_completed"])){
+				if(filter_var($data["is_completed"], FILTER_VALIDATE_INT) === false){
+					$errors[] = "is_completed must be an integer 0 or 1";
+				}
+			}elseif($data["is_completed"] === ''){
+				$errors[] = "You should set the value is_completed at 0 or 1";
+			}
+        }
+
 		return $errors;
+		
 	}
 }

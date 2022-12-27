@@ -54,15 +54,17 @@ class Task{
 		return $this->PdoConnection->lastInsertId();
 	}
 
-	public function update(array $data): string {
-		$sql = "UPDATE task set name= :name, priority= :priority, is_completed= :is_completed";
+	public function update(string $id, array $data): string {
+		$sql = "UPDATE task set name= :name, priority= :priority, is_completed= :is_completed
+		        WHERE id= :id";
 		$statement = $this->PdoConnection->prepare($sql);
 		$statement->bindValue(":name", $data["name"], PDO::PARAM_STR);
 		$statement->bindValue(":priority", $data["priority"] ?? null, PDO::PARAM_INT);
 		$statement->bindValue(":is_completed", $data["is_completed"] ?? false, PDO::PARAM_BOOL);
+		$statement->bindValue(":id", $id ?? null, PDO::PARAM_INT);
 		$statement->execute();
         
-		return $this->PdoConnection->lastInsertId();
+		return true;
 	}
 
 	public function delete(string $id): bool {
